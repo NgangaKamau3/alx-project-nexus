@@ -37,5 +37,21 @@ class TMDbService:
             cache.set(cache_key, data, timeout=3600)  # Cache for 1 hour
         
         return data
+    
+    def search_movies(self, query, page=1):
+        cache_key = f"search_movies_{query}_{page}"
+        cached_data = cache.get(cache_key)
+        
+        if cached_data:
+            return cached_data
+        
+        endpoint = "search/movie"
+        params = {'query': query, 'page': page}
+        data = self._make_request(endpoint, params)
+        
+        if data:
+            cache.set(cache_key, data, timeout=1800)  # Cache for 30 minutes
+        
+        return data
 
 tmdb_service = TMDbService()
