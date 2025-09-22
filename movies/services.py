@@ -22,4 +22,20 @@ class TMDbService:
             logger.error(f"TMDb API request failed: {e}")
             return None
 
+    def get_trending_movies(self, time_window='day', page=1):
+        cache_key = f"trending_movies_{time_window}_{page}"
+        cached_data = cache.get(cache_key)
+        
+        if cached_data:
+            return cached_data
+        
+        endpoint = f"trending/movie/{time_window}"
+        params = {'page': page}
+        data = self._make_request(endpoint, params)
+        
+        if data:
+            cache.set(cache_key, data, timeout=3600)  # Cache for 1 hour
+        
+        return data
+
 tmdb_service = TMDbService()
