@@ -8,8 +8,8 @@ Filtering, Sorting, Pagination: Implement robust logic for efficient product dis
 Database Optimization: Design a high-performance database schema to support seamless queries.
 
 ## Technologies Used
-Django: For building a scalable backend framework.
-PostgreSQL: As the relational database for optimized performance.
-JWT: For secure user authentication.
+Django: For building a scalable backend framework.<br>
+PostgreSQL: As the relational database for optimized performance.<br>
+JWT: For secure user authentication.<br>
 Swagger/OpenAPI: To document and test APIs.
 
