@@ -59,7 +59,7 @@ graph TB
 
 ```
 modestwear/
-├── core/                       # Project root (renamed from mysite/ for clarity)
+├── core/                       # Project root 
 │   ├── settings.py             # Base, Dev, and Production settings
 │   ├── urls.py                 # Root URL config (includes all app URLs)
 │   ├── wsgi.py / asgi.py       # Deployment entry points
