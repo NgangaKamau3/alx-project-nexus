@@ -13,7 +13,7 @@ PostgreSQL: As the relational database for optimized performance.<br>
 JWT: For secure user authentication.<br>
 Swagger/OpenAPI: To document and test APIs.
 
-### System architecture
+## System architecture
 ```mermaid
 graph TB
     %% Styling for Elegance
@@ -54,4 +54,34 @@ graph TB
     %% Apply Style Classes
     class Client,Server box;
     class PersistentStorage storage;
+```
+## Project structure
+
+```
+modestwear/
+├── core/                       # Project root (renamed from mysite/ for clarity)
+│   ├── settings.py             # Base, Dev, and Production settings
+│   ├── urls.py                 # Root URL config (includes all app URLs)
+│   ├── wsgi.py / asgi.py       # Deployment entry points
+├── apps/                       # Subdirectory for all business logic
+│   ├── users/                  # Custom User model, Profiles, JWT logic
+│   │   ├── api/                # API layer for this app
+│   │   │   ├── serializers.py
+│   │   │   └── views.py
+│   │   ├── models.py
+│   │   └── urls.py
+│   ├── catalog/                # Product Discovery, Filters, Search
+│   │   ├── api/
+│   │   │   ├── serializers.py
+│   │   │   └── views.py
+│   │   ├── models.py
+│   │   └── services.py         # Business logic (e.g., complex search)
+│   ├── orders/                 # Cart, Checkout, Stripe Webhooks
+│   ├── outfits/                # Outfit Builder & pgvector logic
+├── static/                     # Collected static files (for Swagger/Admin)
+├── tests/                      # Global integration tests
+├── .env                        # Environment variables (DB_URL, SECRET_KEY)
+├── docker-compose.yml          # Setup for Local Postgres & Redis
+├── requirements.txt            # Dependencies (DRF, Simple-JWT, pgvector)
+└── manage.py
 ```
