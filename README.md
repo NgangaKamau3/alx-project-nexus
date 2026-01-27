@@ -16,36 +16,41 @@ Swagger/OpenAPI: To document and test APIs.
 ### System architecture
 ```mermaid
 graph TB
-    %% Client Layer
-    User((User)) --> WebApp[Next.js Frontend]
+    %% Styling for the 'Elegant' Boxes
+    classDef box fill:none,stroke:#fff,stroke-width:1px,color:#fff;
+    classDef dashed stroke-dasharray: 5 5;
 
-    subgraph "Django Backend (DRF)"
-        WebApp --> Router[DRF URL Router]
-        
-        subgraph "Apps / Modules"
-            Router --> UsersApp[Users App: JWT Auth / Personalization]
-            Router --> CatalogApp[Catalog App: Discovery / Product Pages]
-            Router --> OrderApp[Order App: Cart / Checkout / Delivery]
-            Router --> FeatureApp[Experimental App: Outfit Builder / Virtual Try-On]
-            Router --> AdminApp[Admin App: Custom Management UI]
+    subgraph Client ["CLIENT (Next.js / Tailwind CSS)"]
+        direction LR
+        UI1[Product Discovery] --- UI2[Outfit Builder] --- UI3[Virtual Try-On]
+    end
+
+    %% API Layer based on Django REST Framework
+    subgraph Django ["DJANGO API SERVER (DRF)"]
+        direction TB
+        subgraph Views ["Views / Serializers"]
+            V1[CatalogView: Search & Filters]
+            V2[OrderView: Cart & Stripe SDK]
+            V3[OutfitView: Mix & Match Logic]
+            V4[TryOnView: AI Image Processing]
         end
-
-        %% Middleware & Tools
-        UsersApp --> SimpleJWT[Simple JWT Middleware]
-        CatalogApp --> Swagger[drf-yasg: OpenAPI Docs]
     end
 
-    subgraph "Data Storage & Services"
-        UsersApp & CatalogApp & OrderApp --> Postgres[(PostgreSQL DB)]
-        CatalogApp -.-> Redis((Redis Cache))
-        FeatureApp --> S3[AWS S3: Media Storage]
+    %% Data & Task Layer
+    subgraph Storage ["PostgreSQL & Task Layer"]
+        DB[(PostgreSQL)]
+        Redis((Redis Broker))
     end
 
-    subgraph "External Integrations"
-        OrderApp --> Stripe[Stripe / PayFast API]
-        FeatureApp --> TryOnAI[AI VTO API / GPU Service]
-    end
+    Worker[Celery Worker]
 
-    %% Infrastructure
-    Postgres -.-> Docker[Docker / Compose Environment]
+    %% Connections and Data Flow
+    Client ==>|JWT Auth / HTTP| Django
+    V1 & V2 & V3 -->|Save/Query| DB
+    V4 -->|Queue Task| Redis
+    Redis -.->|Async| Worker
+    Worker -->|Store Media| S3[AWS S3 / Storage]
+
+    %% Apply Style Classes
+    class Client,Django,Views,Storage,Worker box;
 ```
