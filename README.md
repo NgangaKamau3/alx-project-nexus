@@ -16,41 +16,42 @@ Swagger/OpenAPI: To document and test APIs.
 ### System architecture
 ```mermaid
 graph TB
-    %% Styling for the 'Elegant' Boxes
+    %% Styling for Elegance
     classDef box fill:none,stroke:#fff,stroke-width:1px,color:#fff;
-    classDef dashed stroke-dasharray: 5 5;
+    classDef storage fill:#1a1a1a,stroke:#fff,stroke-width:1px,color:#ccc;
 
-    subgraph Client ["CLIENT (Next.js / Tailwind CSS)"]
-        direction LR
-        UI1[Product Discovery] --- UI2[Outfit Builder] --- UI3[Virtual Try-On]
+    subgraph Client ["Frontend (Next.js + Tailwind)"]
+        UI[ModestWear Web App]
+        OB[Outfit Builder UI]
     end
 
-    %% API Layer based on Django REST Framework
-    subgraph Django ["DJANGO API SERVER (DRF)"]
+    subgraph Server ["Backend (Django REST Framework)"]
         direction TB
-        subgraph Views ["Views / Serializers"]
-            V1[CatalogView: Search & Filters]
-            V2[OrderView: Cart & Stripe SDK]
-            V3[OutfitView: Mix & Match Logic]
-            V4[TryOnView: AI Image Processing]
-        end
+        Auth[SimpleJWT Auth]
+        Catalog[Product Catalog API]
+        OutfitEngine[Outfit Recommendation Logic]
+        Orders[Order & Cart Service]
     end
 
-    %% Data & Task Layer
-    subgraph Storage ["PostgreSQL & Task Layer"]
-        DB[(PostgreSQL)]
-        Redis((Redis Broker))
+    subgraph PersistentStorage ["Data & Media (Free Tier)"]
+        DB[(PostgreSQL + pgvector)]
+        Cloudinary[Cloudinary: Media Hosting]
     end
 
-    Worker[Celery Worker]
-
-    %% Connections and Data Flow
-    Client ==>|JWT Auth / HTTP| Django
-    V1 & V2 & V3 -->|Save/Query| DB
-    V4 -->|Queue Task| Redis
-    Redis -.->|Async| Worker
-    Worker -->|Store Media| S3[AWS S3 / Storage]
+    %% Flow Connections
+    UI ==>|JWT Auth| Auth
+    UI --> Catalog
+    UI --> OB
+    OB --> OutfitEngine
+    
+    Catalog --> DB
+    OutfitEngine -->|Similarity Search| DB
+    Orders -->|Payments| Stripe[Stripe / Paystack]
+    
+    %% Media Connections
+    Catalog -.->|Fetch URL| Cloudinary
 
     %% Apply Style Classes
-    class Client,Django,Views,Storage,Worker box;
+    class Client,Server box;
+    class PersistentStorage storage;
 ```
