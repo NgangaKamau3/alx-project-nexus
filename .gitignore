@@ -67,3 +67,5 @@ logs/
 # Celery
 celerybeat-schedule
 celerybeat.pid
+info.txt
+migrations/
