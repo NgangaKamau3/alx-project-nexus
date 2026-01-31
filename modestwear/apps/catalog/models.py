@@ -11,6 +11,7 @@ class Category(models.Model):
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        app_label = "catalog"
         ordering = ('name',)
         verbose_name_plural = 'Categories'
 

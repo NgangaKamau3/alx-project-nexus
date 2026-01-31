@@ -1,6 +1,8 @@
 from django.urls import path, include
 
-from catalog import views
+from apps.catalog import views
+
+app_name = "catalog"
 
 urlpatterns = [
 	path('latest-products/', views.LatestProductList.as_view()),

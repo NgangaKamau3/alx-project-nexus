@@ -3,7 +3,7 @@ from .models import Order, OrderItem
 
 class OrderItemInline(admin.TabularInline):
 	model = OrderItem
-	readonly_fields = ('price_at_purchase')
+	readonly_fields = ('price_at_purchase',)
 	extra = 0
 
 @admin.register(Order)

@@ -39,10 +39,10 @@ INSTALLED_APPS = [
 	"rest_framework.authtoken",
 	"corsheaders",
 	"djoser",
+	"apps.catalog.apps.CatalogConfig",
+	"apps.orders.apps.OrdersConfig",
 	"users",
-	"catalog",
-	"outfits",
-	"orders",	
+	"outfits",	
 ]
 
 CORS_ALLOWED_ORIGINS = [

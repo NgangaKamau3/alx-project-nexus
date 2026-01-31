@@ -20,10 +20,10 @@ urlpatterns = [
 	path("api/v1/", include("djoser.urls.authtoken")),
 	path("api/v1/", 
 	    include([
-			path("post/", include("catalog.urls")),
+			path("post/", include("apps.catalog.urls")),
 			path("swagger/schema/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger-schema"),
 			])
 		),
-	path("api/v1/", include("orders.urls")),
+	path("api/v1/", include("apps.orders.urls")),
 	
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -3,8 +3,8 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from .models import WishList, CartItem, Order, OrderItem
-from .serializers import WishListSerializer, CartItemSerializer, OrderSerializer
+from apps.orders.models import WishList, CartItem, Order, OrderItem
+from apps.orders.serializers import WishListSerializer, CartItemSerializer, OrderSerializer
 
 class WishListView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]

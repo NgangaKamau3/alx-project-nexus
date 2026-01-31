@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from catalog.models import ProductVariant
+from apps.catalog.models import ProductVariant
 class WishList(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 	variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
