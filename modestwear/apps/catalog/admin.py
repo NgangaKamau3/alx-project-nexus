@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
-from .models import Category, Product, ProductImage, ProductVariant, CoverageLevel
+from apps.catalog.models import Category, Product, ProductImage, ProductVariant, CoverageLevel
 
 class ProductVariantInline(admin.TabularInline):
 	model = ProductVariant
@@ -62,3 +63,20 @@ class CoverageLevelAdmin(admin.ModelAdmin):
 	search_fields = (
 		'name',
 	)
+
+@admin.register(ProductVariant)
+class ProductVariantAdmin(admin.ModelAdmin):
+	list_display = ('product', 'size', 'color', 'stock_available')
+
+	def stock_status(self, obj):
+		if obj.quantity <=0:
+			color = 'red'
+			text = 'OUT OF STOCK'
+		elif obj.stock_available <=5:
+			color = 'orange'
+			text = f'LOW STOCK ({obj.stock_available})'
+		else:
+			color = 'green'
+			text = 'IN STOCK'
+
+		return format_html('<b style="color: {};">{}<"/b>', color, text)

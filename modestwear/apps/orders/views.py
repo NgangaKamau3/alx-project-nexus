@@ -5,6 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from apps.orders.models import WishList, CartItem, Order, OrderItem
 from apps.orders.serializers import WishListSerializer, CartItemSerializer, OrderSerializer
+from apps.orders.services import create_order_from_cart
+from django.core.exceptions import ValidationError
 
 class WishListView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -50,25 +52,14 @@ class MoveToCartView(APIView):
         
 
 class CheckoutView(APIView):
-    permission_classes = [IsAuthenticated]
-
     def post(self, request):
-        with transaction.atomic():
-            cart_items = CartItem.objects.filter(user=request.user)
-            if not cart_items.exists():
-                return Response({'error': 'Cart is empty.'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            total_price = sum(item.variant.product.base_price * item.quantity for item in cart_items)
-            order = Order.objects.create(user=request.user,
-                                        total_price=total_price,
-                                        address = request.data.get('address', 'Default Address')
-                                        )
-            for item in cart_items:
-                OrderItem.objects.create(
-                    order=order, 
-                    variant=item.variant,
-                    quantity=item.quantity,
-                    price_at_purchase=item.variant.product.base_price
-                )
-            cart_items.delete()
-            return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
+        cart_items = CartItem.objects.filter(user=request.user)
+        try:
+            order = create_order_from_cart(
+                user=request.user,
+                cart_items=cart_items,
+                address=request.data.get('address')
+            )
+            return Response(OrderSerializer(order).data, status=201)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=400)

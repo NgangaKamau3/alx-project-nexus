@@ -18,12 +18,12 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 	path("api/v1/", include("djoser.urls")),
 	path("api/v1/", include("djoser.urls.authtoken")),
-	path("api/v1/", 
+	path("catalog/", 
 	    include([
-			path("post/", include("apps.catalog.urls")),
+			path("items/", include("apps.catalog.urls")),
 			path("swagger/schema/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger-schema"),
 			])
 		),
-	path("api/v1/", include("apps.orders.urls")),
+	path("orders/", include("apps.orders.urls")),
 	
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
