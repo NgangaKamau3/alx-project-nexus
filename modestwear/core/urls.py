@@ -16,14 +16,15 @@ schema_view = swagger_get_schema_view(
 )
 urlpatterns = [
     path("admin/", admin.site.urls),
-	path("api/v1/", include("djoser.urls")),
-	path("api/v1/", include("djoser.urls.authtoken")),
+	path("auth/", include("djoser.urls")),
+	path("auth/", include("djoser.urls.authtoken")),
 	path("catalog/", 
 	    include([
 			path("items/", include("apps.catalog.urls")),
-			path("swagger/schema/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger-schema"),
 			])
-		),
+),
+	path("docs/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger-schema"),
+	path("redoc/", schema_view.with_ui("redoc"), cache_timeout=0, name="redoc-schema"),
 	path("orders/", include("apps.orders.urls")),
 	
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

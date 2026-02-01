@@ -1,5 +1,6 @@
 from pathlib import Path
 import os, sys
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +49,55 @@ INSTALLED_APPS = [
 CORS_ALLOWED_ORIGINS = [
 	"https://localhost:8080",
 ]
+# settings.py
+AUTH_USER_MODEL = 'users.User'
+
+REST_FRAMEWORK = {
+	"DEFAULT_AUTHENTICATION_CLASSES": {
+		'rest_framework_simplejwt.authentication.JWTAuthenication',
+    },
+	"DEFAULT_PERMISSION_CLASSES": {
+		"rest_framework_permissions.IsAuthenticated",
+    },
+}
+
+SIMPLE_JWT = {
+	"ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+	"REFRESH_TOKEN_LIFETIME": timedelta(days=14),
+	"ROTATE_REFRESH_TOKEN": True,
+	"BLACLIST_AFTER_ROTATION": True,
+	"ALGORITHM": "HS256",
+	"SIGNING_KEY": SECRET_KEY,
+	"AUTH_HEADER_TYPES": ("Bearer"),
+	"USER_ID_FIELD": "id",
+	"USER_ID_CLAIM": "user_id",
+	"AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AcessToken",),
+	"TOKEN_TYPE_CLAIM": "token_type", 
+}
+
+JWT_COOKIE_SECURE = False # Set to True in prod!
+JWT_COOKIE_NAME = "refresh_token"
+
+CACHE = {
+	"default": {
+		"BACKEND": "django.core.cache.backends.redis.RedisCache",
+		"LOCATION": "redis://localhost:6379/0",
+		"TIMEOUT": 3600,
+		"OPTIONS": {
+			"CLIENT_CLASS": "django.redis.client.DefaultClient",
+			"SOCKET_CONNECT_TIMEOUT": 5,
+			"SOCKET_TIMEOUT": 5,
+			"IGNORE_EXCEPTIONS": True,
+        }
+    }
+}
+
+CACHES = {
+	"default": {
+		"BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+		"LOCATION": "unique-snowflake",		
+    }
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
