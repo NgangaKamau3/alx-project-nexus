@@ -10,6 +10,7 @@ python-dotenv>=1.0,<2.0
 whitenoise>=6.6,<7.0
 djoser 
 stripe 
+python-decouple
 
 # Database
 psycopg2-binary>=2.9,<3.0

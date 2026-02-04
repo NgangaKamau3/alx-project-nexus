@@ -5,6 +5,7 @@ from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+from decouple import config
 
 
 # Quick-start development settings - unsuitable for production
@@ -17,12 +18,11 @@ LOGGING = {
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-of6k8gill4-!7ocifyieten3f7a0j=w4b5u8n(7f&1=+h*^5_s"
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+DEBUG = config("DEBUG", default=False, cast=bool)
+ALLOWED_HOSTS = config("ALOWED_HOSTS", default='*', cast=lambda v: [s.strip() for s in v.split[',']])
 
 
 # Application definition
@@ -77,6 +77,12 @@ SIMPLE_JWT = {
 
 JWT_COOKIE_SECURE = False # Set to True in prod!
 JWT_COOKIE_NAME = "refresh_token"
+
+SESSION_COOKIE_DOMAIN =  '.yourdomain.com' # Note the leading dot for subdomain support
+
+# For development
+if DEBUG:
+	SESSION_COOKIE_DOMAIN = None # or 127.0.0.1 for local development
 
 CACHE = {
 	"default": {
@@ -178,3 +184,22 @@ USE_TZ = True
 STATIC_URL = "static/"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media/"
+
+EMAIL_VERIFICATION_TIMEOUT = 3600 *24*3
+
+MOBILE_VERIFICATION_REDIRECT = True #Enable mobile app redirection for verfication
+
+REQUIRE_EMAIL_VERIFICATION = True #Whether to require email verification to use the app
+APP_NAME = 'Modestwear'
+
+# Email settings
+# Using Gmail SMTP
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT =587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = 'modestwear <noreply@yourapp.com>'
+CONTACT_EMAIL = 'support@modestwear'
