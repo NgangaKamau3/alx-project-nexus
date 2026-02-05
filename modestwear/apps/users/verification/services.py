@@ -91,4 +91,53 @@ class EmailVerificationService:
 		except Exception as e:
 			logger.error(f"Failed to send background verification email: {str(e)}")
 			logger.error(traceback.format_exc())
+	
+	@staticmethod
+	def check_verification_status(user):
+		"""
+		Check email verification status
+		Args:
+		    user: User object
+		Returns:
+		    tuple: (success, response_dict, status_code)
+		"""
+		try:
+			cache_key = EmailVerificationService.get_verification_cache_key(user.pk)
+			cached_status = cache.get(cache_key)
 
+			# If we have a cached status, use it
+			if cached_status is not None:
+				logger.info(f"Using cached verification status for user {user.pk}: {cached_status}")
+				return True, {
+					"success": True,
+					"data": {'is_verified': cached_status}
+				}, 200
+			
+			# If not in cache, query the database
+			try:
+				fresh_user = User.objects.get(pk=user.pk)
+				is_verified = fresh_user.is_verified
+
+				# Cache the result for future queries
+
+				cache.set(cache_key, is_verified, timeout=3600)
+				logger.info(f"Fetched verification status from DB for user {user.pk}: {is_verified}")
+				return True, {
+					"success": True,
+					"data": {'is_verified': is_verified}
+				}, 200
+			except User.DoesNotExist:
+				logger.error(f"User {user.pk} mpt found in database.")
+				return False, {
+					"success": False,
+					"error": "User not found"
+				}, 404
+		except Exception as e:
+			logger.error(f"Check verification status error: {str(e)}")
+
+			# Return last known status from DB to degrade gracefully
+			return True, {
+				"success": True,
+				"data": {'is_verified': user.is_verified},
+				"message": "Could not check latest status using existing information"
+			}, 200

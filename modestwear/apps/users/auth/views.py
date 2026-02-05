@@ -185,4 +185,73 @@ class ValidateToken(BaseAPIView):
             token = auth_header.split(' ')[1]
 
             # Use service layer for token validation logic
+            success, response_data, status_code = AuthenticationService.validate_token(token, user)
+            return Response(
+                standardized_response(**response_data), 
+                status=status_code
+            )
+        
+        return Response(
+            standardized_response(success=False, error="No token provided."),
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
+class LogoutView(BaseAPIView):
+    """
+    Logout endpoint that invalidates tokens
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            user = request.user
+
+            # Get refresh token
+            refresh_token = None
+
+            # Try to get from request data
+            if 'refresh_token' in request.data:
+                refresh_token = request.data.get('refresh_token')
+
+            # try to get from cookie if enabled
+            elif settings.JWT_COOKIE_SECURE:
+                refresh_token = request.COOKIES.get(settings.JWT_COOKIE_NAME)
+            
+            # Use service layer for logout
+            success, response_data, status_code = AuthenticationService.logout(user, refresh_token)
+
+            # Create response object
+            response = Response(
+                standardized_response(**response_data),
+                status=status_code
+            )
+
+            # Clear refresh token cookie if it was used
+            if settings.JWT_COOKIE_SECURE:
+                response.delete_cookie(
+                    key=settings.JWT_COOKIE_NAME,
+                    path='/',
+                    domain=settings.SESSION_COOKIE_DOMAIN
+                )
+            
+            return response
+        except Exception as e:
+            logger.error(f"Logout error: {str(e)}")
+            logger.error(traceback.format_exc())
+
+            # Still try to clear the cookie on error
+            response = Response(
+                standardized_response(
+                    success=True,
+                    message="Logout processed"
+                ),
+                status=status.HTTP_200_OK
+            )
+
+            if settings.JWT_COOKIE_SECURE:
+                response.delete_cookie(
+                    key=settings.JWT_COOKIE_NAME,
+                    path='/',
+                    domain=settings.SESSION_COOKIE_DOMAIN
+                )
+            return response

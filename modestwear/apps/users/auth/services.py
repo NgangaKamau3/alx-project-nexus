@@ -234,13 +234,76 @@ class AuthenticationService:
                 "success": False,
                 "error": "An error occured during token refresh."
             }, 500
-                
-                
+  
+    @staticmethod
+    def validate_token(token, user):
+        """
+        Validate a token and check if it belongs tto the user.
+        Args:
+            token(str): The token to validate
+            user: The user object to check against
+        Returns:
+            tuple: (success, response_dict, status_code)
+        """
 
-                
+        is_valid, user_id, token_type = TokenManager.validate_token(token)
+        if not is_valid or user_id != user.id:
+            logger.warning(f"Token validation failed: Excpected user {user.id} but got {user_id}")
+            return False, {
+                "success": False,
+                "error": "Token validation failed."
+            }
+        
+        # Access verification status through the service layer with cache handling
+        from apps.users.verification.services import EmailVerificationService
+        success, verification_response, _ = EmailVerificationService.check_verification_status(user)
 
+        if not success:
+            logger.error(f"Error checking verification status for user {user.id}")
 
+            # Fall back to provided user object
+            is_verified = user.is_verified
+
+        else:
+            is_verified = verification_response.get('data', {}).get('is_verified', user.is_verifed)
+
+        logger.info(f"Token validation retrieved veririfcation status for user {user.id}: is_verified={is_verified}")
+
+        return True, {
+            "success": True,
+            "data": {
+                'valid': True,
+                'user_id': user.id,
+                'email_verified': is_verified
+            }
+        }, 200
     
+    @staticmethod
+    def logout(user, refresh_token=None):
+        """
+        Handle user logout, invalidating tokens as needed
+        Args:
+            user: User object logging out
+            refresh_token(str, optional): The refresh token to invalidate
+        Returns:
+            tuple: (success, response_dict, status_code)
+        """
 
+        # Invalidate specific token if provided
+        if refresh_token:
+            try:
+                token= RefreshToken(refresh_token)
+                jti = token.get('jti')
+                if jti:
+                    TokenManager.blacklist_token(jti)
+                    logger.info(f"Token blacklisted during logout: {jti}")
+            except Exception as e:
+                logger.warning(f"Error blacklisting token during logouy: {str(e)}")
 
+        # Log the logout event
+        logger.info(f"User logged out: {user.id}")
 
+        return True, {
+            "success": True,
+            "message": "Successfully logged out"
+        }, 200
