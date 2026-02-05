@@ -197,6 +197,43 @@ class AuthenticationService:
                 "success": False,
                 "error": "Authentication failed. Please try again"
             }, 401
+        
+    
+    @staticmethod
+    def refresh_token(refresh_token):
+        """Refresh an authentication token
+        Args:
+            refresh_token(sttr): The refresh token to use
+            
+        Returns:
+            tuple: (success, response_dict, status_code)
+        """
+
+        if not refresh_token:
+            return False, {
+                "success": False,
+                "error": "Refresh token is required."
+            }, 400
+        try:
+            # Use token manager to refresh the tokens
+            tokens = TokenManager.refresh_tokens(refresh_token)
+
+            # Return successful response data
+            return True, {
+                "success": True,
+                "data": {
+                    'access_token': tokens['access_token'],
+                    'refresh_token': tokens['refresh_token'],
+                    'token_type': tokens['token_type'],
+                    'expires_in': tokens['expires_in']
+                }
+            }, 200
+        except Exception as e:
+            logger.error(f"Token refresh error: {str(e)}")
+            return False, {
+                "success": False,
+                "error": "An error occured during token refresh."
+            }, 500
                 
                 
 

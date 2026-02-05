@@ -94,3 +94,95 @@ class UserLoginView(BaseAPIView):
             )
 
             # Set refresh token cookie was successful and cookie security is enabled
+            if success and status_code == 200 and settings.JWT_COOKIE_SECURE:
+                tokens = response_data.get('data', {}).get('tokens', {})
+                if 'refresh_token' in tokens and 'refresh_expires_in' in tokens:
+                    response.set_cookie(
+                        key=settings.JWT_COOKIE_NAME,
+                        value= tokens['refresh_token'],
+                        expires=timezone.now() + timedelta(seconds=tokens['refresh_expires_in']),
+                        secure=True,
+                        httponly=True,
+                        samesite= "Strict",
+                        path='/',
+                        domain=settings.SESSION_COOKIE_DOMAIN
+                    )
+
+            # Set CSRF token for added security
+            if success:
+                get_token(request)
+            return response
+        except Exception as e:
+            logger.error(f"Login error: {str(e)}")
+            logger.error(traceback.format_exc())
+            return Response(
+                standardized_response(success=False, error="An unexpected error occured. Please try again later."),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+class TokenRefreshView(BaseAPIView):
+    """
+    API endpoint for refreshing JWT tokens with robust security measures. """
+    permission_classes = [AllowAny]
+    throttle_classes = [AnonRateThrottle]
+    def post(self, request):
+        try:
+            # First, try to get refresh token from request body. 
+            refresh_token = request.data.get('refresh_token')
+
+
+            # If not in body, try to get from HTTP only cookie
+            if not refresh_token and settings.JWT_COOKIE_SECURE:
+                refresh_token = request.COOKIES.get(settings.JWT_COOKIE_NAME)
+            
+            # Use service layer for token refresh logic
+            success, response_data, status_code = AuthenticationService.refresh_token(refresh_token)
+
+            # Create response object
+            response = Response(
+                standardized_response(**response_data),
+                status=status_code
+            )
+
+            # Update HTTP-only cookie if enabled and refresh was successful
+            if success and status_code == 200 and settings.JWT_COOKIE_SECURE:
+                tokens = response_data.get('data', {})
+                if 'refresh_token' in tokens and 'expires_in' in tokens:
+                    response.set_cookie(
+                        key=settings.JWT_COOKIE_NAME,
+                        value=tokens['refresh_token'],
+                        expires=timezone.now() + timedelta(seconds=tokens['expires_in']),
+                        secure=True,
+                        httponly=True,
+                        samesite= "Strict",
+                        path='/',
+                        domain=settings.SESSION_COOKIE_DOMAIN
+                    )
+            if success:
+                get_token(request)
+
+            return response
+        except Exception as e:
+            logger.error(f"Token refresh error: {str(e)}")
+            return Response(
+                standardized_response(success=False, error="An error occures during token refresh"), status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+
+class ValidateToken(BaseAPIView):
+    """
+    Token validation with additional security checks
+    
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        # Get token from authorization header
+        auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+        if auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+
+            # Use service layer for token validation logic
+
