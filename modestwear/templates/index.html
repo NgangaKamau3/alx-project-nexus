@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModestWear API</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #fff; }
+        .container { max-width: 800px; padding: 2rem; text-align: center; }
+        h1 { font-size: 3rem; margin-bottom: 1rem; }
+        p { font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9; }
+        .links { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        a { background: rgba(255,255,255,0.2); padding: 1rem 2rem; border-radius: 8px; text-decoration: none; color: #fff; font-weight: 600; backdrop-filter: blur(10px); transition: all 0.3s; }
+        a:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+        .status { margin-top: 3rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px; }
+        .endpoint { text-align: left; margin-top: 2rem; background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 8px; }
+        .endpoint h3 { margin-bottom: 1rem; }
+        .endpoint code { background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 4px; display: block; margin: 0.5rem 0; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌙 ModestWear API</h1>
+        <p>Elegant & Modest Women's Fashion E-Commerce Platform</p>
+        
+        <div class="links">
+            <a href="/admin/">Admin Panel</a>
+            <a href="/docs/">API Docs (Swagger)</a>
+            <a href="/redoc/">API Docs (ReDoc)</a>
+        </div>
+
+        <div class="status">
+            <h2>✅ API Status: Online</h2>
+            <p style="font-size: 0.9rem; margin-top: 0.5rem;">Django {{ django_version }} | DRF | PostgreSQL | Redis</p>
+        </div>
+
+        <div class="endpoint">
+            <h3>🚀 Quick Start</h3>
+            <p style="margin-bottom: 1rem;">Test the API with curl:</p>
+            <code># Register a new user<br>curl -X POST {{ base_url }}/api/auth/register/ \<br>  -H "Content-Type: application/json" \<br>  -d '{"email":"user@example.com","username":"testuser","password":"SecurePass123!"}'</code>
+            
+            <code># Get products<br>curl {{ base_url }}/api/catalog/products/</code>
+            
+            <code># Get categories<br>curl {{ base_url }}/api/catalog/categories/</code>
+        </div>
+    </div>
+</body>
+</html>
