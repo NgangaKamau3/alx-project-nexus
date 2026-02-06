@@ -1,8 +1,11 @@
 from django.http import JsonResponse
 from django.db import connection
 from django.views.decorators.http import require_http_methods
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import AllowAny
 
 @require_http_methods(["GET"])
+@permission_classes([AllowAny])
 def health_check(request):
     try:
         # Check database connection
