@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ModestWear API Tester</title>
+    <style>
+        body { font-family: Arial; max-width: 1200px; margin: 20px auto; padding: 20px; }
+        .endpoint { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .method { display: inline-block; padding: 5px 10px; border-radius: 3px; color: white; font-weight: bold; }
+        .get { background: #61affe; }
+        .post { background: #49cc90; }
+        .put { background: #fca130; }
+        .delete { background: #f93e3e; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0; box-sizing: border-box; }
+        button { background: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer; }
+        button:hover { background: #45a049; }
+        .response { background: #f4f4f4; padding: 10px; margin-top: 10px; border-radius: 3px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🧪 ModestWear API Tester</h1>
+    <input type="text" id="baseUrl" placeholder="API Base URL (e.g., https://your-app.onrender.com)" value="">
+
+    <div class="endpoint">
+        <span class="method get">GET</span> <strong>/health/</strong>
+        <p>Health check endpoint</p>
+        <button onclick="testEndpoint('GET', '/health/')">Test</button>
+        <div id="response-health" class="response"></div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method post">POST</span> <strong>/api/auth/register/</strong>
+        <p>Register new user</p>
+        <textarea id="register-body" rows="6">{"username": "testuser", "email": "test@example.com", "password": "testpass123", "first_name": "Test", "last_name": "User"}</textarea>
+        <button onclick="testEndpoint('POST', '/api/auth/register/', 'register-body')">Test</button>
+        <div id="response-register" class="response"></div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method post">POST</span> <strong>/api/auth/login/</strong>
+        <p>Login user</p>
+        <textarea id="login-body" rows="3">{"username": "testuser", "password": "testpass123"}</textarea>
+        <button onclick="testEndpoint('POST', '/api/auth/login/', 'login-body')">Test</button>
+        <div id="response-login" class="response"></div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span> <strong>/catalog/items/products/</strong>
+        <p>List all products</p>
+        <button onclick="testEndpoint('GET', '/catalog/items/products/')">Test</button>
+        <div id="response-products" class="response"></div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span> <strong>/catalog/items/categories/</strong>
+        <p>List all categories</p>
+        <button onclick="testEndpoint('GET', '/catalog/items/categories/')">Test</button>
+        <div id="response-categories" class="response"></div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span> <strong>/orders/cart/</strong>
+        <p>Get user cart (requires auth token)</p>
+        <input type="text" id="auth-token" placeholder="Bearer token from login">
+        <button onclick="testEndpoint('GET', '/orders/cart/', null, true)">Test</button>
+        <div id="response-cart" class="response"></div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span> <strong>/outfits/</strong>
+        <p>List public outfits</p>
+        <button onclick="testEndpoint('GET', '/outfits/')">Test</button>
+        <div id="response-outfits" class="response"></div>
+    </div>
+
+    <script>
+        async function testEndpoint(method, path, bodyId = null, requiresAuth = false) {
+            const baseUrl = document.getElementById('baseUrl').value.trim();
+            if (!baseUrl) {
+                alert('Please enter API Base URL');
+                return;
+            }
+
+            const url = baseUrl + path;
+            const responseId = 'response-' + path.split('/').filter(x => x)[0];
+            const responseDiv = document.getElementById(responseId);
+            
+            responseDiv.textContent = 'Loading...';
+
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            if (requiresAuth) {
+                const token = document.getElementById('auth-token').value.trim();
+                if (!token) {
+                    responseDiv.textContent = 'Error: Auth token required';
+                    return;
+                }
+                options.headers['Authorization'] = token;
+            }
+
+            if (bodyId) {
+                const body = document.getElementById(bodyId).value;
+                options.body = body;
+            }
+
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                responseDiv.textContent = `Status: ${response.status}\n\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                responseDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

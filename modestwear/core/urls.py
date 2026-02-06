@@ -8,7 +8,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view as swagger_get_schema_view
 from core.admin import admin_site
 from .health import health_check
-from .views import index
+from .views import index, api_tester
 
 # Import admin registry to register models
 import core.admin_registry
@@ -28,6 +28,7 @@ urlpatterns = [
     path("admin/", admin_site.urls),
     path("django-admin/", admin.site.urls),
     path("health/", health_check, name="health-check"),
+    path("test-api/", api_tester, name="api-tester"),
 	path("api/auth/", include('users.urls')),
 	path("api/catalog/", include("apps.catalog.urls")),
 	path("api/orders/", include("apps.orders.urls")),

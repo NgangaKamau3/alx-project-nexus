@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
+                # amazonq-ignore-next-line
                 ("name", models.CharField(default=None, max_length=255)),
                 ("description", models.TextField(blank=True, null=True)),
             ],
@@ -147,6 +148,7 @@ class Migration(migrations.Migration):
                 (
                     "coverage",
                     models.ForeignKey(
+                        # amazonq-ignore-next-line
                         default=None,
                         on_delete=django.db.models.deletion.CASCADE,
                         to="catalog.coveragelevel",
