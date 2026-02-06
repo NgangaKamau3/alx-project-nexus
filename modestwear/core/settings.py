@@ -6,12 +6,13 @@ from urllib.parse import urlparse, parse_qsl
 import dj_database_url
 from whitenoise.middleware import WhiteNoise
 
-load_dotenv()
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+
+# Load .env from core directory
+load_dotenv(BASE_DIR / 'core' / '.env')
+
 from decouple import config
 
 
@@ -25,7 +26,7 @@ LOGGING = {
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-key-for-ci-only")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
@@ -177,10 +178,6 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 # Database - PostgreSQL with pgvector (Neon)
 if os.getenv("DATABASE_URL"):
-# Add these at the top of your settings.py
-
-
-# Replace the DATABASES section of your settings.py with this
     tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
 
     DATABASES = {
@@ -192,6 +189,14 @@ if os.getenv("DATABASE_URL"):
             'HOST': tmpPostgres.hostname,
             'PORT': 5432,
             'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
+            'CONN_MAX_AGE': 0,
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
