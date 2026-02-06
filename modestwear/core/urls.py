@@ -29,14 +29,10 @@ urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("health/", health_check, name="health-check"),
 	path("api/auth/", include('users.urls')),
-	path("catalog/", 
-	    include([
-			path("items/", include("apps.catalog.urls")),
-			])
-),
+	path("api/catalog/", include("apps.catalog.urls")),
+	path("api/orders/", include("apps.orders.urls")),
+	path("api/outfits/", include("apps.outfits.urls")),
 	path("docs/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger-schema"),
 	path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="redoc-schema"),
-	path("orders/", include("apps.orders.urls")),
-	path("outfits/", include("apps.outfits.urls")),
 	
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

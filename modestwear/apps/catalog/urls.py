@@ -12,9 +12,9 @@ from apps.catalog.recommendation_views import (
 app_name = "catalog"
 
 urlpatterns = [
-	path('latest-products/', views.LatestProductList.as_view()),
-	path('products/search/', views.search),
-	path('products/<slug:category_slug>/<slug:product_slug>', views.ProductDetail.as_view()),
+	path('products/', views.LatestProductList.as_view(), name='product-list'),
+	path('products/search/', views.search, name='product-search'),
+	path('products/<slug:category_slug>/<slug:product_slug>/', views.ProductDetail.as_view(), name='product-detail'),
 	
 	# Recommendation endpoints
 	path('recommendations/for-me/', user_recommendations, name='user-recommendations'),

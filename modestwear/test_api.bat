@@ -1,7 +1,7 @@
 @echo off
 REM API Endpoint Test Script for ModestWear (Windows)
 
-set BASE_URL=http://localhost:8000
+set BASE_URL=https://modestwear.onrender.com
 echo Testing ModestWear API at %BASE_URL%
 echo ======================================
 
