@@ -25,7 +25,7 @@ LOGGING = {
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
@@ -85,14 +85,24 @@ SIMPLE_JWT = {
 	"BLACKLIST_TIMEOUT": 86400,
 }
 
-JWT_COOKIE_SECURE = False # Set to True in prod!
+JWT_COOKIE_SECURE = not DEBUG
 JWT_COOKIE_NAME = "refresh_token"
 
-SESSION_COOKIE_DOMAIN =  '.yourdomain.com' # Note the leading dot for subdomain support
+SESSION_COOKIE_DOMAIN = '.yourdomain.com'
 
-# For development
-if DEBUG:
-	SESSION_COOKIE_DOMAIN = None # or 127.0.0.1 for local development
+# Security Settings
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+else:
+    SESSION_COOKIE_DOMAIN = None
 
 # Redis Cache Configuration
 CACHES = {
@@ -165,13 +175,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "core.wsgi.application"
 
-# Database - PostgreSQL with pgvector
-tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+# Database - PostgreSQL with pgvector (Neon)
 if os.getenv("DATABASE_URL"):
-	DATABASES = {
-		"default": dj_database_url.config(conn_max_age=600, conn_health_checks=True, ssl_require=True)
-    }
-else:
+# Add these at the top of your settings.py
+
+
+# Replace the DATABASES section of your settings.py with this
+    tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -182,7 +193,7 @@ else:
             'PORT': 5432,
             'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
         }
-}
+    }
 
 
 # Password validation
@@ -236,10 +247,10 @@ APP_NAME = 'Modestwear'
 # Using Gmail SMTP
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_HOST = os.getenv('EMAIL_HOST', "localhost")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = 'modestwear <noreply@yourapp.com>'
 CONTACT_EMAIL = 'support@modestwear'

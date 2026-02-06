@@ -41,7 +41,7 @@ jobs:
         cd modestwear
         python manage.py migrate
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/modestwear_test
+        DATABASE_URL: 
     
     - name: Run tests with coverage
       run: |
