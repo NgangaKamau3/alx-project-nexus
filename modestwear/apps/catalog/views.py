@@ -41,4 +41,4 @@ def search(request):
 		serializer = ProductSerializer(products, many=True)
 		return Response(serializer.data)
 	else:
-		return Response({"products": []}))
+		return Response({"products": []})
