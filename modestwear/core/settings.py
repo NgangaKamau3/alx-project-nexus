@@ -265,6 +265,8 @@ else:
 
 EMAIL_VERIFICATION_TIMEOUT = 3600 *24*3
 
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://modestwear.onrender.com')
+
 MOBILE_VERIFICATION_REDIRECT = True #Enable mobile app redirection for verfication
 
 REQUIRE_EMAIL_VERIFICATION = True #Whether to require email verification to use the app
