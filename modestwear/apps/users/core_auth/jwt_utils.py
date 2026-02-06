@@ -30,10 +30,10 @@ class TokenManager:
             
             access_token = refresh.access_token
             access_token['type'] = 'access'
-            access_token['jti'] = str(uuid.uuid4)
+            access_token['jti'] = str(uuid.uuid4())
 
             # Get expiration times from settings
-            access_expiry = settings.SIMPLE_JWT.get('ACCESS_TOKEN_LIFEIME', timedelta(minutes=15))
+            access_expiry = settings.SIMPLE_JWT.get('ACCESS_TOKEN_LIFETIME', timedelta(minutes=15))
             refresh_expiry = settings.SIMPLE_JWT.get('REFRESH_TOKEN_LIFETIME', timedelta(days=14))
 
             # Store token metadata in cache for potential revocation
@@ -55,7 +55,7 @@ class TokenManager:
             token = RefreshToken(refresh_token)
 
             # Check if token is blacklisted
-            jti = token.get(jti)
+            jti = token.get('jti')
             if not jti or TokenManager.is_token_blacklisted(jti):
                 logger.warning(f"Attempt to use blacklisted token with JTI: {jti}")
                 raise TokenError("Token is blacklisted")
@@ -96,7 +96,7 @@ class TokenManager:
             alg = unverified.get('alg', settings.SIMPLE_JWT.get('ALGORITHM', 'HS256'))
 
             # Properly decode and verify
-            decoded = jwt.decode(token_string, settings.SIMPLE_JWT('SIGNING_KEY', settings.SECRET_KEY), algorithms=[alg], options= {"verify_signature": True})
+            decoded = jwt.decode(token_string, settings.SIMPLE_JWT.get('SIGNING_KEY', settings.SECRET_KEY), algorithms=[alg], options={"verify_signature": True})
             # Check token type
             token_type =  decoded.get('token_type', decoded.get('type', 'access'))
             user_id = decoded.get('user_id')

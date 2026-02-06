@@ -1,5 +1,4 @@
 import logging
-import threading
 import traceback
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
@@ -9,7 +8,7 @@ from apps.users.verification.emails import EmailService
 from apps.users.verification.tokens import TokenVerifier
 
 
-User = get_user_model
+User = get_user_model()
 logger = logging.getLogger(__name__)
 
 class EmailVerificationService:
@@ -50,22 +49,19 @@ class EmailVerificationService:
             
             # Queue verification email to be sent in background
             try:
-                # Queue verification email to be sent in background
-                threading.Thread(
-                    target=EmailVerificationService.send_verification_email_background,
-                    args= (user.id),
-                    daemon=True
-                    ).start()
+                # Use Celery task instead of threading
+                from apps.users.tasks import send_verification_email_task
+                send_verification_email_task.delay(user.id)
                 
-                # Set rate limiting regardless of background thread success
+                # Set rate limiting regardless of task success
                 cache.set(rate_key, True, timeout=300)
                 logger.info(f"Verification email queued for {user.email}")
                 return True, {
                     "success": True,
                     "message": "Verification email sent successfully. Please check your email inbox."
                 }, 200
-            except Exception as thread_error:
-                logger.error(f"Failed to queue verification email thread: {str(thread_error)}")
+            except Exception as task_error:
+                logger.error(f"Failed to queue verification email task: {str(task_error)}")
                 return False, {
                     "success": False,
                     "error": "Failed to send verification email. Please try again later."

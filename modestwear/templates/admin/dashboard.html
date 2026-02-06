@@ -1,0 +1,97 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}ModestWear Dashboard{% endblock %}
+
+{% block extrahead %}
+<style>
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+.stat-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.stat-number {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #417690;
+    margin-bottom: 5px;
+}
+.stat-label {
+    color: #666;
+    font-size: 0.9em;
+    text-transform: uppercase;
+}
+.dashboard-section {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 20px;
+}
+.section-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+    border-bottom: 2px solid #417690;
+    padding-bottom: 5px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>ModestWear Dashboard</h1>
+
+<div class="dashboard-stats">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_users }}</div>
+        <div class="stat-label">Total Users</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ total_products }}</div>
+        <div class="stat-label">Products</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ total_orders }}</div>
+        <div class="stat-label">Total Orders</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">${{ total_revenue|floatformat:2 }}</div>
+        <div class="stat-label">Total Revenue</div>
+    </div>
+</div>
+
+<div class="dashboard-section">
+    <div class="section-title">Recent Activity</div>
+    <p>Orders (Last 7 Days): <strong>{{ recent_orders }}</strong></p>
+    <p>New Users (Last 7 Days): <strong>{{ recent_users }}</strong></p>
+</div>
+
+<div class="dashboard-section">
+    <div class="section-title">Order Status</div>
+    {% for status in order_status %}
+    <p>{{ status.status|title }}: {{ status.count }} orders</p>
+    {% empty %}
+    <p>No orders yet.</p>
+    {% endfor %}
+</div>
+
+<div class="dashboard-section">
+    <div class="section-title">Top Products</div>
+    {% for product in top_products %}
+    <p><strong>{{ product.name }}</strong> - {{ product.order_count }} orders</p>
+    {% empty %}
+    <p>No sales data available.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

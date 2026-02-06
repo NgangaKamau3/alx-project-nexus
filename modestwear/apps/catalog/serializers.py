@@ -10,5 +10,4 @@ class ProductSerializer(serializers.ModelSerializer):
 			"get_absolute_url",
 			"description",
 			"base_price",
-
 		)

@@ -22,14 +22,15 @@ class CartItemSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = CartItem
 		fields = ['id', 'variant', 'variant_details', 'quantity', 'subtotal']
-		def get_subtotal(self, obj):
-			return obj.variant.product.base_price * obj.quantity
+	
+	def get_subtotal(self, obj):
+		return obj.variant.product.base_price * obj.quantity
 		
 class OrderItemSerializer(serializers.ModelSerializer):
 	variant_details = VariantBriefSerializer(source='variant', read_only=True)
 	class Meta:
 		model = OrderItem
-		fields = ['id', 'variant-details', 'quantity', 'price_at_purchase']
+		fields = ['id', 'variant_details', 'quantity', 'price_at_purchase']
 
 class OrderSerializer(serializers.ModelSerializer):
 	items = OrderItemSerializer(many=True, read_only=True)

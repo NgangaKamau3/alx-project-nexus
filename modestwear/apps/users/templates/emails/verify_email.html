@@ -1,0 +1,24 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Verify Your Email - ModestWear{% endblock %}
+
+{% block header %}Verify Your Email{% endblock %}
+
+{% block content %}
+<h2>Welcome to ModestWear!</h2>
+<p>Hi {{ user.username }},</p>
+<p>Thank you for registering with ModestWear. To complete your registration, please verify your email address by clicking the button below:</p>
+
+<div style="text-align: center;">
+    <a href="{{ verification_url }}" class="button">Verify Email Address</a>
+</div>
+
+<p>Or copy and paste this link into your browser:</p>
+<p style="word-break: break-all; color: #3498db;">{{ verification_url }}</p>
+
+<p><strong>This link will expire in {{ expiry_hours }} hours.</strong></p>
+
+<p>If you didn't create an account with ModestWear, please ignore this email.</p>
+
+<p>Best regards,<br>The ModestWear Team</p>
+{% endblock %}

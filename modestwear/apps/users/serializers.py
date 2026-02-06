@@ -3,7 +3,7 @@ from apps.users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    profile_picure_url = serializers.SerializerMethodField()
+    profile_picture_url = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = ('id', 'email', 'username', 'first_name', 'last_name', 'profile_picture', 'profile_picture_url', 'phone_number', 'created_at')
@@ -11,5 +11,5 @@ class UserSerializer(serializers.ModelSerializer):
         
     def get_profile_picture_url(self, obj):
         if obj.profile_picture:
-            return self.context['request'].build_absolute_uri(obj.profile_picture_url)
+            return self.context['request'].build_absolute_uri(obj.profile_picture.url)
         return None

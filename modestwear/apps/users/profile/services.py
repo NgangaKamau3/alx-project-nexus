@@ -158,7 +158,7 @@ class ProfileService:
 		Returns:
 		    bool: True if valid image file
 		"""
-		if not isinstance(file, InMemoryUploadedFile, UploadedFile):
+		if not isinstance(file, (InMemoryUploadedFile, UploadedFile)):
 			return False
 		
 		# Check content type
@@ -167,7 +167,7 @@ class ProfileService:
 			return False
 		
 		# Check file extensions
-		valid_extensions = ['.jpg', '.jpeg', '.jpg', '.gif', '.webp']
+		valid_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
 		file_ext = os.path.splitext(file.name)[1].lower()
 		if file_ext not in valid_extensions:
 			return False

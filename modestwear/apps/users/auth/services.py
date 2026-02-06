@@ -27,7 +27,7 @@ class AuthenticationService:
         Returns:
             tuple: (success, response_dict, status_code)
             """
-        from apps.users.verification. services import EmailVerificationService
+        from apps.users.verification.services import EmailVerificationService
         if not email or not password:
             return False, {"Success": False, "error": "Email and passwword are requires"}, 400
         
@@ -66,17 +66,14 @@ class AuthenticationService:
 
             # Queue verification email for new users asynchronously
             if user.email and settings.REQUIRE_EMAIL_VERIFICATION:
-                # Use cache to mark that verification email should be sent
-                cache_key = f"queue_verification_email_{user.id}"
-                cache.set(cache_key, True, timeout=3600) # Use one hour queue validity
-                
                 try:
-                # Trigger an asynchronous task for EmailVerificationService for sending emails
-                    EmailVerificationService.send_verification_email_background(user.id)
+                    # Use Celery task for sending emails
+                    from apps.users.tasks import send_verification_email_task
+                    send_verification_email_task.delay(user.id)
                     logger.info(f"Queued verification email for user: {user.email}")
-                except Exception as thread_error:
+                except Exception as task_error:
                     # Log but don't fail registration if email queuing fails
-                    logger.error(f"Failed to queue verification email {str(thread_error)}")
+                    logger.error(f"Failed to queue verification email {str(task_error)}")
                 
         # Serialize user data
             serializer = UserSerializer(user)
@@ -144,7 +141,7 @@ class AuthenticationService:
             # If authentication fails
             if not user:
                 # Increment failed login attempts
-                failed_attempts = cache.get(f"failed_logins: {email}", 0), +1
+                failed_attempts = cache.get(f"failed_logins: {email}", 0) + 1
                 cache.set(f"failed_logins: {email}", failed_attempts, timeout=1800)
                 if failed_attempts >= 5:
                      cache.set(f"account_lockout: {email}", True, timeout=900)
@@ -185,7 +182,7 @@ class AuthenticationService:
                 # Return successful response
                 return True, {
                     "data": {
-                        "user": serialzer.data,
+                        "user": serializer.data,
                         "tokens": tokens,
                         "email_verified": user.is_verified,
                         "verification_needed": not user.is_verified and settings.REQUIRE_EMAIL_VERIFICATION
@@ -265,7 +262,7 @@ class AuthenticationService:
             is_verified = user.is_verified
 
         else:
-            is_verified = verification_response.get('data', {}).get('is_verified', user.is_verifed)
+            is_verified = verification_response.get('data', {}).get('is_verified', user.is_verified)
 
         logger.info(f"Token validation retrieved veririfcation status for user {user.id}: is_verified={is_verified}")
 

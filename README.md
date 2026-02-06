@@ -13,6 +13,23 @@ PostgreSQL: As the relational database for optimized performance.<br>
 JWT: For secure user authentication.<br>
 Swagger/OpenAPI: To document and test APIs.
 
+## API Documentation
+**Live Documentation:**
+- Swagger UI: http://localhost:8000/docs/
+- ReDoc: http://localhost:8000/redoc/
+
+**Generate Static Documentation:**
+```bash
+# Generate HTML files for sharing with frontend developers
+generate_docs.bat
+```
+This creates:
+- `api_docs.html` - Interactive Swagger documentation
+- `api_redoc.html` - Interactive ReDoc documentation  
+- `api_schema.json` - OpenAPI schema file
+
+Share these files with frontend developers - they work offline in any browser.
+
 ## System architecture
 ```mermaid
 graph TB

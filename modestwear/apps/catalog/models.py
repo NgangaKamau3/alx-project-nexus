@@ -46,10 +46,10 @@ class Product(models.Model):
     
 
 class ProductVariant(models.Model):
-    product = models.ForeignKey(Product, default=None, related_name='products', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, default=None, related_name='variants', on_delete=models.CASCADE)
     sku = models.CharField( max_length=255, unique=True)
     size = models.IntegerField(default=0)
-    color = models.CharField(max_length=100, default= None, choices='')
+    color = models.CharField(max_length=100, default=None)
     coverage = models.ForeignKey(CoverageLevel, default=None,  on_delete=models.CASCADE)
     stock_available =models.IntegerField(default=0)
     is_active = models.BooleanField(default=False)
@@ -63,18 +63,18 @@ class ProductImage(models.Model):
 
     def get_image(self):
         if self.image:
-            return 'http://127.0.0.1/8000' + self.image.url
+            return 'http://127.0.0.1:8000' + self.image.url
         
         return ''
     def get_thumbnail(self):
         if self.thumbnail:
-            return 'http://127.0.0.1/8000' + self.thumbnail.url
+            return 'http://127.0.0.1:8000' + self.thumbnail.url
         else:
             if self.image:
                 self.thumbnail = self.make_thumbnail(self.image)
                 self.save()
 
-                return 'http://127.0.0.1/8000' + self.thumbnail.url
+                return 'http://127.0.0.1:8000' + self.thumbnail.url
             
             else:
                 return ''

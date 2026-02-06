@@ -56,7 +56,7 @@ class VerifyEmailView(BaseAPIView):
 		# Forward to POST method for consistent handling
 		return self.post(request)
 	
-class SendVerificationEmail(BaseAPIView):
+class SendVerificationEmailView(BaseAPIView):
 	"""
 	Endpoint for sending verification email
 	"""

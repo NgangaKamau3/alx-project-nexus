@@ -169,7 +169,7 @@ class TokenRefreshView(BaseAPIView):
             )
         
 
-class ValidateToken(BaseAPIView):
+class ValidateTokenView(BaseAPIView):
     """
     Token validation with additional security checks
     

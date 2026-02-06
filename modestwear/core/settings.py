@@ -22,7 +22,7 @@ SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
-ALLOWED_HOSTS = config("ALOWED_HOSTS", default='*', cast=lambda v: [s.strip() for s in v.split[',']])
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default='*', cast=lambda v: [s.strip() for s in v.split(',')])
 
 
 # Application definition
@@ -37,13 +37,14 @@ INSTALLED_APPS = [
 	"rest_framework",
 	"drf_yasg",
 	"rest_framework_simplejwt",
-	"rest_framework.authtoken",
+	"rest_framework_simplejwt.token_blacklist",
 	"corsheaders",
 	"djoser",
+	"django_celery_beat",
 	"apps.catalog.apps.CatalogConfig",
 	"apps.orders.apps.OrdersConfig",
-	"users",
-	"outfits",	
+	"apps.users.apps.UsersConfig",
+	"apps.outfits.apps.OutfitsConfig",	
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -53,26 +54,27 @@ CORS_ALLOWED_ORIGINS = [
 AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
-	"DEFAULT_AUTHENTICATION_CLASSES": {
-		'rest_framework_simplejwt.authentication.JWTAuthenication',
-    },
-	"DEFAULT_PERMISSION_CLASSES": {
-		"rest_framework_permissions.IsAuthenticated",
-    },
+	"DEFAULT_AUTHENTICATION_CLASSES": [
+		'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+	"DEFAULT_PERMISSION_CLASSES": [
+		"rest_framework.permissions.IsAuthenticated",
+    ],
 }
 
 SIMPLE_JWT = {
 	"ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
 	"REFRESH_TOKEN_LIFETIME": timedelta(days=14),
-	"ROTATE_REFRESH_TOKEN": True,
-	"BLACLIST_AFTER_ROTATION": True,
+	"ROTATE_REFRESH_TOKENS": True,
+	"BLACKLIST_AFTER_ROTATION": True,
 	"ALGORITHM": "HS256",
 	"SIGNING_KEY": SECRET_KEY,
-	"AUTH_HEADER_TYPES": ("Bearer"),
+	"AUTH_HEADER_TYPES": ("Bearer",),
 	"USER_ID_FIELD": "id",
 	"USER_ID_CLAIM": "user_id",
-	"AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AcessToken",),
-	"TOKEN_TYPE_CLAIM": "token_type", 
+	"AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+	"TOKEN_TYPE_CLAIM": "token_type",
+	"BLACKLIST_TIMEOUT": 86400,
 }
 
 JWT_COOKIE_SECURE = False # Set to True in prod!
@@ -84,13 +86,13 @@ SESSION_COOKIE_DOMAIN =  '.yourdomain.com' # Note the leading dot for subdomain 
 if DEBUG:
 	SESSION_COOKIE_DOMAIN = None # or 127.0.0.1 for local development
 
-CACHE = {
+# Redis Cache Configuration
+CACHES = {
 	"default": {
-		"BACKEND": "django.core.cache.backends.redis.RedisCache",
-		"LOCATION": "redis://localhost:6379/0",
-		"TIMEOUT": 3600,
+		"BACKEND": "django_redis.cache.RedisCache",
+		"LOCATION": config("REDIS_URL", default="redis://127.0.0.1:6379/1"),
 		"OPTIONS": {
-			"CLIENT_CLASS": "django.redis.client.DefaultClient",
+			"CLIENT_CLASS": "django_redis.client.DefaultClient",
 			"SOCKET_CONNECT_TIMEOUT": 5,
 			"SOCKET_TIMEOUT": 5,
 			"IGNORE_EXCEPTIONS": True,
@@ -98,11 +100,27 @@ CACHE = {
     }
 }
 
-CACHES = {
-	"default": {
-		"BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-		"LOCATION": "unique-snowflake",		
-    }
+# Celery Configuration
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://127.0.0.1:6379/0")
+CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://127.0.0.1:6379/0")
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+# Celery Beat Schedule (Periodic Tasks)
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'cleanup-expired-tokens': {
+        'task': 'apps.users.tasks.cleanup_expired_tokens',
+        'schedule': crontab(hour=2, minute=0),  # Daily at 2 AM
+    },
+    'check-low-stock': {
+        'task': 'apps.orders.tasks.check_low_stock_alerts',
+        'schedule': crontab(minute=0),  # Every hour
+    },
 }
 
 MIDDLEWARE = [
@@ -121,7 +139,7 @@ ROOT_URLCONF = "core.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -135,14 +153,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "core.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
+# Database - PostgreSQL with pgvector
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("DB_NAME", default="modestwear_db"),
+        "USER": config("DB_USER", default="postgres"),
+        "PASSWORD": config("DB_PASSWORD", default="postgres"),
+        "HOST": config("DB_HOST", default="localhost"),
+        "PORT": config("DB_PORT", default="5432"),
+        "OPTIONS": {
+            "connect_timeout": 10,
+        },
     }
 }
 

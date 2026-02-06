@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import TokenError
-from core_auth.response import standardized_response
+from apps.users.core_auth.response import standardized_response
 
 
 logger = logging.getLogger(__name__)
@@ -20,4 +20,4 @@ class BaseAPIView(APIView):
 				status=status.HTTP_401_UNAUTHORIZED
 			)
 		logger.error(f"Unexpected error: {str(exc)}")
-		logger.error(traceback.format_exc)
+		logger.error(traceback.format_exc())
