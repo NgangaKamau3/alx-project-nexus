@@ -16,13 +16,17 @@ from apps.users.admin import UserAdmin
 
 User = get_user_model()
 
+# Test credentials (not real credentials)
+TEST_ADMIN_PASSWORD = 'AdminTestPass123!'
+TEST_USER_PASSWORD = 'UserTestPass123!'
+
 @pytest.mark.django_db
 class AdminSiteTests(TestCase):
     def setUp(self):
         self.admin_user = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
-            password='adminpass123'
+            password=TEST_ADMIN_PASSWORD
         )
         self.client = Client()
         self.client.force_login(self.admin_user)
@@ -49,12 +53,12 @@ class CustomAdminDashboardTests(TestCase):
         self.admin_user = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
-            password='adminpass123'
+            password=TEST_ADMIN_PASSWORD
         )
         self.regular_user = User.objects.create_user(
             username='user',
             email='user@example.com',
-            password='userpass123'
+            password=TEST_USER_PASSWORD
         )
         self.client = Client()
         self.client.force_login(self.admin_user)
@@ -165,7 +169,7 @@ class ProductAdminTests(TestCase):
         self.admin_user = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
-            password='adminpass123'
+            password=TEST_ADMIN_PASSWORD
         )
         self.client = Client()
         self.client.force_login(self.admin_user)
@@ -205,7 +209,7 @@ class CategoryAdminTests(TestCase):
         self.admin_user = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
-            password='adminpass123'
+            password=TEST_ADMIN_PASSWORD
         )
         self.client = Client()
         self.client.force_login(self.admin_user)
@@ -238,12 +242,12 @@ class OrderAdminTests(TestCase):
         self.admin_user = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
-            password='adminpass123'
+            password=TEST_ADMIN_PASSWORD
         )
         self.regular_user = User.objects.create_user(
             username='user',
             email='user@example.com',
-            password='userpass123'
+            password=TEST_USER_PASSWORD
         )
         self.client = Client()
         self.client.force_login(self.admin_user)

@@ -7,17 +7,21 @@ from rest_framework import status
 
 User = get_user_model()
 
+# Test constants (not real credentials)
+TEST_PASSWORD = 'TestPass123!'
+TEST_ADMIN_PASSWORD = 'AdminPass123!'
+
 @pytest.mark.django_db
 class UserModelTests(TestCase):
     def test_user_creation(self):
         user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
-            password='testpass123'
+            password=TEST_PASSWORD
         )
         self.assertEqual(user.username, 'testuser')
         self.assertEqual(user.email, 'test@example.com')
-        self.assertTrue(user.check_password('testpass123'))
+        self.assertTrue(user.check_password(TEST_PASSWORD))
         self.assertFalse(user.is_staff)
         self.assertTrue(user.is_active)
     
@@ -25,7 +29,7 @@ class UserModelTests(TestCase):
         admin_user = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
-            password='adminpass123'
+            password=TEST_ADMIN_PASSWORD
         )
         self.assertTrue(admin_user.is_staff)
         self.assertTrue(admin_user.is_superuser)
@@ -34,7 +38,7 @@ class UserModelTests(TestCase):
         user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
-            password='testpass123'
+            password=TEST_PASSWORD
         )
         self.assertEqual(str(user), 'testuser')
 

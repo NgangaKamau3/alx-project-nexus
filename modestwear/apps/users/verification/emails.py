@@ -53,6 +53,7 @@ class EmailService:
             
             except Exception as template_error:
                 logger.error(f"Template rendering error: {str(template_error)}")
+                logger.error(traceback.format_exc())
                 html_message = None
                 plain_message = f"""
                 Hello {user.email}
@@ -164,6 +165,7 @@ class EmailService:
             
             except Exception as template_error:
                 logger.error(f"Template rendering error: {str(template_error)}")
+                logger.error(traceback.format_exc())
                 html_message = None
                 plain_message = f"""
                 Hello {user.email}

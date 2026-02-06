@@ -67,16 +67,20 @@ class Command(BaseCommand):
         test_users = []
         for i in range(5):
             username = f'testuser{i+1}'
-            user, created = User.objects.get_or_create(
-                username=username,
-                defaults={
-                    'email': f'{username}@example.com',
-                    'password': 'pbkdf2_sha256$600000$temp$invalid'
-                }
-            )
-            test_users.append(user)
-            if created:
-                self.stdout.write(f'Created user: {username}')
+            try:
+                user, created = User.objects.get_or_create(
+                    username=username,
+                    defaults={
+                        'email': f'{username}@example.com',
+                        'password': 'pbkdf2_sha256$600000$temp$invalid'
+                    }
+                )
+                test_users.append(user)
+                if created:
+                    self.stdout.write(f'Created user: {username}')
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f'Error creating user {username}: {str(e)}'))
+                continue
         
         # Create sample orders for collaborative filtering
         product_list = list(products.values())

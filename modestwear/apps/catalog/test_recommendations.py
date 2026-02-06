@@ -38,7 +38,7 @@ class RecommendationServiceTest(TestCase):
 class RecommendationAPITest(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username='testuser', email='test@test.com', password='pass123'
+            username='testuser', email='test@test.com', password='TestSecurePass123!'
         )
         self.category = Category.objects.create(name='Dresses', slug='dresses')
         self.product = Product.objects.create(
