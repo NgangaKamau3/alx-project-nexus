@@ -50,15 +50,16 @@ class AuthenticationService:
             user = User.objects.create_user(
                 email=email,
                 password=password,
-                is_verified = False  #Email verification needed
-
-
+                username=email.split('@')[0],  # Use email prefix as username
+                is_verified=False  # Email verification needed
             )
 
             # Update additional fields if provided
             if full_name:
-                user.full_name = full_name
-                user.save(update_fields = ['full_name'])
+                name_parts = full_name.split(' ', 1)
+                user.first_name = name_parts[0]
+                user.last_name = name_parts[1] if len(name_parts) > 1 else ''
+                user.save(update_fields=['first_name', 'last_name'])
 
             if phone_number:
                 user.phone_number = phone_number
@@ -163,12 +164,13 @@ class AuthenticationService:
                     "success": False,
                     "error": "Account is disabled. Please contact support."
                 }, 403
-                
-                cache.delete(f"failed_logins: {email}")
-                serializer = UserSerializer(user)
+            
+            # Clear failed login attempts on successful authentication
+            cache.delete(f"failed_logins: {email}")
+            serializer = UserSerializer(user)
 
-                # Generate tokens
-                tokens = TokenManager.generate_tokens(user)
+            # Generate tokens
+            tokens = TokenManager.generate_tokens(user)
 
                 # Record login with devide info for audit trail
                 user.last_login = timezone.now()
