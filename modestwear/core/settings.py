@@ -57,8 +57,14 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-	"https://localhost:8080",
+    "http://localhost:3000",
+    "http://localhost:3001",
 ]
+if not DEBUG:
+    CORS_ALLOWED_ORIGINS = [
+        "https://yourdomain.com",
+        "https://www.yourdomain.com",
+    ]
 # settings.py
 AUTH_USER_MODEL = 'users.User'
 
