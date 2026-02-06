@@ -44,8 +44,8 @@ class UserRegistrationView(BaseAPIView):
 
         # Set refresh token cookie if registration was successful and cookie security is enabled
             if success and status_code in (200, 201) and settings.JWT_COOKIE_SECURE:
-                tokens = response_data.get('data', {}).get('tokens, {}')
-                if 'refresh_token' in tokens and 'refresh_token' in tokens:
+                tokens = response_data.get('data', {}).get('tokens', {})
+                if 'refresh_token' in tokens and 'refresh_expires_in' in tokens:
                     response.set_cookie(
                         key= settings.JWT_COOKIE_NAME,
                         value= tokens['refresh_token'], 
