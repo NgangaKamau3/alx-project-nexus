@@ -1,6 +1,13 @@
 from pathlib import Path
 import os, sys
 from datetime import timedelta
+from dotenv import load_dotenv
+from urllib.parse import urlparse, parse_qsl
+import dj_database_url
+from whitenoise.middleware import WhiteNoise
+
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +30,8 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default='*', cast=lambda v: [s.strip() for s in v.split(',')])
-
+CSRF_ALLOWED_ORIGINS = [
+	"https://*.onrender.com"],
 
 # Application definition
 
@@ -122,9 +130,13 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(minute=0),  # Every hour
     },
 }
+if CELERY_BROKER_URL.startswith("rediss://"):
+	CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": "ssl.CERT_REQUIRED"}
+	CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": "ssl.CERT_REQUIRED"}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+	"whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
 	"corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -154,18 +166,22 @@ TEMPLATES = [
 WSGI_APPLICATION = "core.wsgi.application"
 
 # Database - PostgreSQL with pgvector
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME", default="modestwear_db"),
-        "USER": config("DB_USER", default="postgres"),
-        "PASSWORD": config("DB_PASSWORD", default="postgres"),
-        "HOST": config("DB_HOST", default="localhost"),
-        "PORT": config("DB_PORT", default="5432"),
-        "OPTIONS": {
-            "connect_timeout": 10,
-        },
+tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+if os.getenv("DATABASE_URL"):
+	DATABASES = {
+		"default": dj_database_url.config(conn_max_age=600, conn_health_checks=True, ssl_require=True)
     }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': tmpPostgres.path.replace('/', ''),
+            'USER': tmpPostgres.username,
+            'PASSWORD': tmpPostgres.password,
+            'HOST': tmpPostgres.hostname,
+            'PORT': 5432,
+            'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
+        }
 }
 
 
@@ -204,6 +220,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.store.CompressedManifestStaticFilesStorage"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media/"
 

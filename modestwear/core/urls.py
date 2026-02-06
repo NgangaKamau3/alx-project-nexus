@@ -7,6 +7,7 @@ from drf_yasg import openapi
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view as swagger_get_schema_view
 from core.admin import admin_site
+from .health import health_check
 
 # Import admin registry to register models
 import core.admin_registry
@@ -24,6 +25,7 @@ schema_view = swagger_get_schema_view(
 urlpatterns = [
     path("admin/", admin_site.urls),  # Custom admin
     path("django-admin/", admin.site.urls),  # Fallback admin
+    path("health/", health_check, name="health-check"),
 	path("api/auth/", include('users.urls')),
 	path("catalog/", 
 	    include([

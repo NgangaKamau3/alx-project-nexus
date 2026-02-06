@@ -16,6 +16,8 @@ class OutfitListCreateView(generics.ListCreateAPIView):
         return OutfitSerializer
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Outfit.objects.none()
         return Outfit.objects.filter(user=self.request.user).prefetch_related('items__product')
 
 class OutfitDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -23,6 +25,8 @@ class OutfitDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OutfitSerializer
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Outfit.objects.none()
         return Outfit.objects.filter(user=self.request.user).prefetch_related('items__product')
 
 class PublicOutfitListView(generics.ListAPIView):
