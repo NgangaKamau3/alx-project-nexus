@@ -131,6 +131,8 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 # Celery Beat Schedule (Periodic Tasks)
 from celery.schedules import crontab
+import ssl
+
 CELERY_BEAT_SCHEDULE = {
     'cleanup-expired-tokens': {
         'task': 'apps.users.tasks.cleanup_expired_tokens',
@@ -142,8 +144,8 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 if CELERY_BROKER_URL.startswith("rediss://"):
-	CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": "ssl.CERT_REQUIRED"}
-	CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": "ssl.CERT_REQUIRED"}
+    CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
+    CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
