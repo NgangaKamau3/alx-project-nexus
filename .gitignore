@@ -68,5 +68,4 @@ logs/
 celerybeat-schedule
 celerybeat.pid
 info.txt
-migrations/
 papers/
