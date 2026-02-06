@@ -34,7 +34,6 @@ jobs:
     
     - name: Install dependencies
       run: |
-        cd modestwear
         pip install -r requirements.txt
     
     - name: Run migrations
