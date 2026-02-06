@@ -1,0 +1,57 @@
+name: ModestWear CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: modestwear_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd modestwear
+        pip install -r requirements.txt
+    
+    - name: Run migrations
+      run: |
+        cd modestwear
+        python manage.py migrate
+      env:
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/modestwear_test
+    
+    - name: Run tests with coverage
+      run: |
+        cd modestwear
+        pytest --cov=apps --cov-report=xml --cov-report=term-missing
+      env:
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/modestwear_test
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./modestwear/coverage.xml

@@ -11,6 +11,7 @@ whitenoise>=6.6,<7.0
 djoser 
 stripe 
 python-decouple
+dj-database-url
 
 # Database
 psycopg2-binary>=2.9,<3.0

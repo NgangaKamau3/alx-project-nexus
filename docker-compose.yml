@@ -31,31 +31,7 @@ services:
       timeout: 5s
       retries: 5
 
-  celery_worker:
-    build: .
-    container_name: modestwear_celery
-    command: celery -A core worker -l info
-    depends_on:
-      - redis
-      - postgres
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-    volumes:
-      - .:/app
-
-  celery_beat:
-    build: .
-    container_name: modestwear_celery_beat
-    command: celery -A core beat -l info
-    depends_on:
-      - redis
-      - postgres
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-    volumes:
-      - .:/app
-
+  
 volumes:
   postgres_data:
   redis_data:
