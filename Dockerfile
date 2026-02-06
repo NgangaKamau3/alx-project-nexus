@@ -8,8 +8,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY modestwear/ .
 
-RUN python manage.py collectstatic --noinput
-
 EXPOSE 8000
 
 CMD ["bash", "deploy.sh"]
