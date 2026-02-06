@@ -24,7 +24,8 @@ class TokenManager:
             # Add custom claims with security considerations
             refresh['jti'] = jti
             refresh['username'] = user.username
-            refresh['is_staff'] = user.is_verified
+            refresh['is_staff'] = user.is_staff
+            refresh['is_verified'] = user.is_verified
             refresh['email'] = user.email
             refresh['type'] = 'refresh'
             
