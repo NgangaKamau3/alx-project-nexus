@@ -41,14 +41,19 @@ jobs:
         cd modestwear
         python manage.py migrate
       env:
-        DATABASE_URL: 
+        SECRET_KEY: test-secret-key-for-ci-only
+        DEBUG: True
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/modestwear_test 
     
     - name: Run tests with coverage
       run: |
         cd modestwear
         pytest --cov=apps --cov-report=xml --cov-report=term-missing
       env:
+        SECRET_KEY: test-secret-key-for-ci-only
+        DEBUG: True
         DATABASE_URL: postgres://postgres:postgres@localhost:5432/modestwear_test
+        ALLOWED_HOSTS: localhost,127.0.0.1
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
