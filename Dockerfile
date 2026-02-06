@@ -7,6 +7,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY modestwear/ .
+COPY deploy.sh .
+RUN chmod +x deploy.sh
 
 EXPOSE 8000
 
