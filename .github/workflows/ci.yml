@@ -9,20 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: modestwear_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
 
     steps:
     - uses: actions/checkout@v3
@@ -36,23 +22,13 @@ jobs:
       run: |
         pip install -r requirements.txt
     
-    - name: Run migrations
-      run: |
-        cd modestwear
-        python manage.py migrate
-      env:
-        SECRET_KEY: test-secret-key-for-ci-only
-        DEBUG: True
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/modestwear_test 
-    
     - name: Run tests with coverage
       run: |
         cd modestwear
-        pytest --cov=apps --cov-report=xml --cov-report=term-missing
+        pytest --cov=apps --cov-report=xml --cov-report=term-missing --ds=core.settings
       env:
         SECRET_KEY: test-secret-key-for-ci-only
         DEBUG: True
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/modestwear_test
         ALLOWED_HOSTS: localhost,127.0.0.1
     
     - name: Upload coverage to Codecov
