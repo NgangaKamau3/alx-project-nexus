@@ -238,8 +238,22 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.store.CompressedManifestStaticFilesStorage"
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media/"
+
+# Media files - Cloudinary for production, local for development
+if os.getenv('CLOUDINARY_URL'):
+    import cloudinary
+    import cloudinary.uploader
+    import cloudinary.api
+    
+    cloudinary.config(
+        cloudinary_url=os.getenv('CLOUDINARY_URL')
+    )
+    
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'
+else:
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media/"
 
 EMAIL_VERIFICATION_TIMEOUT = 3600 *24*3
 
