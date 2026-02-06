@@ -173,23 +173,23 @@ class AuthenticationService:
             tokens = TokenManager.generate_tokens(user)
 
                 # Record login with devide info for audit trail
-                user.last_login = timezone.now()
-                user.save(update_fields=['last_login'])
+            user.last_login = timezone.now()
+            user.save(update_fields=['last_login'])
 
                 # Log successful login
 
-                if request_meta:
+            if request_meta:
                     logger.info(f"Login successful for user: {user.email} from IP: {request_meta.get('REMOTE_ADDR')}")
 
                 # Return successful response
-                return True, {
-                    "data": {
-                        "user": serializer.data,
-                        "tokens": tokens,
-                        "email_verified": user.is_verified,
-                        "verification_needed": not user.is_verified and settings.REQUIRE_EMAIL_VERIFICATION
-                    }
-                }, 200
+            return True, {
+                "data": {
+                    "user": serializer.data,
+                    "tokens": tokens,
+                    "email_verified": user.is_verified,
+                    "verification_needed": not user.is_verified and settings.REQUIRE_EMAIL_VERIFICATION
+                }
+            }, 200
         except Exception as e:
             logger.error(f"Login error: {str(e)}")
             return False, {
