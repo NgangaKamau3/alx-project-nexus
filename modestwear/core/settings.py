@@ -132,8 +132,8 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
-CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_TASK_ALWAYS_EAGER = True  # Run tasks synchronously without Celery worker
+CELERY_TASK_EAGER_PROPAGATES = True
 
 # Celery Beat Schedule (Periodic Tasks)
 from celery.schedules import crontab
