@@ -68,13 +68,16 @@ class AuthenticationService:
             # Queue verification email for new users asynchronously
             if user.email and settings.REQUIRE_EMAIL_VERIFICATION:
                 try:
-                    # Use Celery task for sending emails
-                    from apps.users.tasks import send_verification_email_task
-                    send_verification_email_task.delay(user.id)
-                    logger.info(f"Queued verification email for user: {user.email}")
-                except Exception as task_error:
-                    # Log but don't fail registration if email queuing fails
-                    logger.error(f"Failed to queue verification email {str(task_error)}")
+                    # Send email directly (Celery runs synchronously with EAGER mode)
+                    from apps.users.verification.emails import EmailService
+                    email_sent = EmailService.send_verification_email(user)
+                    if email_sent:
+                        logger.info(f"Verification email sent to: {user.email}")
+                    else:
+                        logger.warning(f"Failed to send verification email to: {user.email}")
+                except Exception as email_error:
+                    # Log but don't fail registration if email fails
+                    logger.error(f"Email error: {str(email_error)}")
                 
         # Serialize user data
             serializer = UserSerializer(user)
