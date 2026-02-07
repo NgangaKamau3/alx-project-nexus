@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ModestWear - Social Auth Test</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        body { font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .result { margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 5px; }
+        pre { background: #fff; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>ModestWear Social Auth Test</h1>
+    <p>Test Google Sign-In integration</p>
+    
+    <div id="g_id_onload"
+         data-client_id="{{ google_client_id }}"
+         data-callback="handleCredentialResponse">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
+    
+    <div class="result" id="result" style="display:none;">
+        <h3>Response:</h3>
+        <pre id="response"></pre>
+    </div>
+
+    <script>
+        function handleCredentialResponse(response) {
+            fetch('/api/auth/social/google/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: response.credential })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(err => {
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('response').textContent = 'Error: ' + err;
+            });
+        }
+    </script>
+</body>
+</html>
