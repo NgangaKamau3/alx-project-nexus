@@ -159,8 +159,8 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 if CELERY_BROKER_URL.startswith("rediss://"):
-    CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_REQUIRED}
-    CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": ssl.CERT_REQUIRED}
+    CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
+    CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
