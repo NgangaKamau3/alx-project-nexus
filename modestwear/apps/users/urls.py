@@ -2,6 +2,7 @@ from django.urls import path, include
 from apps.users.auth.views import(UserLoginView, UserRegistrationView, TokenRefreshView, ValidateTokenView, LogoutView)
 from apps.users.profile.views import UserProfileView
 from apps.users.verification.views import (VerifyEmailView, SendVerificationEmailView, CheckVerificationStatusView, PasswordResetView, ConfirmPasswordResetView)
+from apps.users.social_auth import GoogleLogin, FacebookLogin
 
 app_name = 'users'
 
@@ -20,5 +21,9 @@ urlpatterns = [
 	path('send-verification/', SendVerificationEmailView.as_view(), name= 'check-verification'),
 	path('verification-status/', CheckVerificationStatusView.as_view(), name='check_verification'),
 	path('password-reset/', PasswordResetView.as_view(), name='password-reset'),
-	path('password-reset-confirm/', ConfirmPasswordResetView.as_view(), name= 'confirm_password_reset')
+	path('password-reset-confirm/', ConfirmPasswordResetView.as_view(), name= 'confirm_password_reset'),
+	
+	# Social auth
+	path('social/google/', GoogleLogin.as_view(), name='google_login'),
+	path('social/facebook/', FacebookLogin.as_view(), name='facebook_login'),
 ]
