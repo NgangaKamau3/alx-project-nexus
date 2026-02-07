@@ -1,10 +1,15 @@
 from pathlib import Path
 import os, sys
+import warnings
 from datetime import timedelta
 from dotenv import load_dotenv
 from urllib.parse import urlparse, parse_qsl
 import dj_database_url
 from whitenoise.middleware import WhiteNoise
+
+# Suppress naive datetime warnings in production
+if not os.getenv('DEBUG', 'False') == 'True':
+    warnings.filterwarnings('ignore', category=RuntimeWarning, message='.*received a naive datetime.*')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
