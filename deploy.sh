@@ -10,6 +10,6 @@ echo "Collecting static files ..."
 python manage.py collectstatic --noinput
 
 echo "Starting Celery worker .."
-celery -A core worker --concurrency=2 --loglevel=info & 
+ celery -A app worker --pool=gevent --concurrency=1 --loglevel=info & 
 echo "Starting Gunicorn server.."
 gunicorn core.wsgi:application --bind 0.0.0.0:$PORT

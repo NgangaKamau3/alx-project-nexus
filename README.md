@@ -15,20 +15,10 @@ Swagger/OpenAPI: To document and test APIs.
 
 ## API Documentation
 **Live Documentation:**
-- Swagger UI: http://localhost:8000/docs/
-- ReDoc: http://localhost:8000/redoc/
+- Swagger UI: https://modestwear.onrender.com/docs/
+- ReDoc: https://modestwear.onrender.com/redoc/
 
-**Generate Static Documentation:**
-```bash
-# Generate HTML files for sharing with frontend developers
-generate_docs.bat
-```
-This creates:
-- `api_docs.html` - Interactive Swagger documentation
-- `api_redoc.html` - Interactive ReDoc documentation  
-- `api_schema.json` - OpenAPI schema file
 
-Share these files with frontend developers - they work offline in any browser.
 
 ## System architecture
 ```mermaid

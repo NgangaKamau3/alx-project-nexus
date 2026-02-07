@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
 	"rest_framework",
 	"drf_yasg",
 	"rest_framework_simplejwt",
@@ -50,6 +51,13 @@ INSTALLED_APPS = [
 	"corsheaders",
 	"djoser",
 	"django_celery_beat",
+	"allauth",
+	"allauth.account",
+	"allauth.socialaccount",
+	"allauth.socialaccount.providers.google",
+	"allauth.socialaccount.providers.facebook",
+	"dj_rest_auth",
+	"dj_rest_auth.registration",
 	"apps.catalog.apps.CatalogConfig",
 	"apps.orders.apps.OrdersConfig",
 	"apps.users.apps.UsersConfig",
@@ -65,12 +73,13 @@ if not DEBUG:
         "https://yourdomain.com",
         "https://www.yourdomain.com",
     ]
-# settings.py
+SITE_ID = 1
 AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
 	"DEFAULT_AUTHENTICATION_CLASSES": [
 		'rest_framework_simplejwt.authentication.JWTAuthentication',
+		'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ],
 	"DEFAULT_PERMISSION_CLASSES": [
 		"rest_framework.permissions.IsAuthenticated",
@@ -150,8 +159,8 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 if CELERY_BROKER_URL.startswith("rediss://"):
-    CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
-    CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
+    CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_REQUIRED}
+    CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": ssl.CERT_REQUIRED}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -163,6 +172,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -283,3 +293,49 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = 'modestwear <noreply@yourapp.com>'
 CONTACT_EMAIL = 'support@modestwear'
+
+# Django-allauth Configuration
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory' if REQUIRE_EMAIL_VERIFICATION else 'optional'
+ACCOUNT_ADAPTER = 'apps.users.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'apps.users.adapters.CustomSocialAccountAdapter'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+
+# Social Auth Providers
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'APP': {
+            'client_id': os.getenv('GOOGLE_CLIENT_ID', ''),
+            'secret': os.getenv('GOOGLE_CLIENT_SECRET', ''),
+        }
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email', 'public_profile'],
+        'FIELDS': ['id', 'email', 'name', 'first_name', 'last_name', 'picture'],
+        'APP': {
+            'client_id': os.getenv('FACEBOOK_CLIENT_ID', ''),
+            'secret': os.getenv('FACEBOOK_CLIENT_SECRET', ''),
+        }
+    }
+}
+
+# dj-rest-auth settings
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'access_token',
+    'JWT_AUTH_REFRESH_COOKIE': 'refresh_token',
+    'JWT_AUTH_HTTPONLY': False,
+    'USER_DETAILS_SERIALIZER': 'apps.users.api.serializers.UserSerializer',
+    'REGISTER_SERIALIZER': 'apps.users.api.serializers.CustomRegisterSerializer',
+}
