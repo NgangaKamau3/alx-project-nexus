@@ -3,7 +3,6 @@ from apps.users.auth.views import(UserLoginView, UserRegistrationView, TokenRefr
 from apps.users.profile.views import UserProfileView
 from apps.users.verification.views import (VerifyEmailView, SendVerificationEmailView, CheckVerificationStatusView, PasswordResetView, ConfirmPasswordResetView)
 from apps.users.social_auth import GoogleLogin, FacebookLogin
-from apps.users.test_views import social_auth_test
 
 app_name = 'users'
 
@@ -27,5 +26,4 @@ urlpatterns = [
 	# Social auth
 	path('social/google/', GoogleLogin.as_view(), name='google_login'),
 	path('social/facebook/', FacebookLogin.as_view(), name='facebook_login'),
-	path('social/test/', social_auth_test, name='social_auth_test'),
 ]

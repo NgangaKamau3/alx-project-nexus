@@ -62,9 +62,12 @@ CORS_ALLOWED_ORIGINS = [
 ]
 if not DEBUG:
     CORS_ALLOWED_ORIGINS = [
-        "https://yourfrontend.vercel.app",
-        "https://www.modestwear.com",
-        "https://admin.modestwear.com",
+        "https://modestwear-app.vercel.app",
+        "https://modestwear.onrender.com",
+    ]
+    CSRF_TRUSTED_ORIGINS = [
+        "https://modestwear-app.vercel.app",
+        "https://modestwear.onrender.com",
     ]
 AUTH_USER_MODEL = 'users.User'
 
@@ -95,8 +98,6 @@ SIMPLE_JWT = {
 JWT_COOKIE_SECURE = not DEBUG
 JWT_COOKIE_NAME = "refresh_token"
 
-SESSION_COOKIE_DOMAIN = '.yourdomain.com'
-
 # Security Settings
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
@@ -108,8 +109,6 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
-else:
-    SESSION_COOKIE_DOMAIN = None
 
 # Redis Cache Configuration
 CACHES = {
@@ -266,7 +265,7 @@ else:
 
 EMAIL_VERIFICATION_TIMEOUT = 3600 *24*3
 
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://modestwear.onrender.com')
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://modestwear-app.vercel.app')
 
 MOBILE_VERIFICATION_REDIRECT = True #Enable mobile app redirection for verfication
 

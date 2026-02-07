@@ -15,6 +15,8 @@ urlpatterns = [
 	path('products/', views.LatestProductList.as_view(), name='product-list'),
 	path('products/search/', views.search, name='product-search'),
 	path('products/<slug:category_slug>/<slug:product_slug>/', views.ProductDetail.as_view(), name='product-detail'),
+	path('categories/', views.categories_list, name='categories-list'),
+	path('filters/', views.get_filters, name='filters'),
 	
 	# Recommendation endpoints
 	path('recommendations/for-me/', user_recommendations, name='user-recommendations'),
