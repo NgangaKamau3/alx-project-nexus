@@ -12,4 +12,4 @@ python manage.py collectstatic --noinput
 echo "Starting Celery worker .."
 celery -A core worker --pool=gevent --concurrency=4 --loglevel=info & 
 echo "Starting Gunicorn server.."
-gunicorn core.wsgi:application --bind 0.0.0.0:$PORT
+gunicorn core.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120 --graceful-timeout 30 --keep-alive 5
