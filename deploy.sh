@@ -6,6 +6,9 @@ echo "Deployment Script for Modestwear.."
 echo "Migrating to database.."
 python manage.py migrate
 
+echo "Creating superuser if needed.."
+python manage.py create_superuser
+
 echo "Collecting static files ..."
 python manage.py collectstatic --noinput
 
