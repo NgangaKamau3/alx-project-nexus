@@ -10,15 +10,20 @@ User = get_user_model()
 def send_verification_email_task(self, user_id):
     """
     Celery task to send verification email
-    Retries up to 3 times with 60 second delay
+    Runs synchronously with CELERY_TASK_ALWAYS_EAGER=True
     """
     try:
         from apps.users.verification.emails import EmailService
         
         user = User.objects.get(id=user_id)
-        EmailService.send_verification_email_with_retry(user_id, max_retries=3)
-        logger.info(f"Verification email sent successfully for user {user_id}")
-        return f"Email sent to {user.email}"
+        success = EmailService.send_verification_email(user)
+        
+        if success:
+            logger.info(f"Verification email sent successfully for user {user_id}")
+            return f"Email sent to {user.email}"
+        else:
+            logger.error(f"Failed to send verification email for user {user_id}")
+            raise Exception("Email sending failed")
         
     except User.DoesNotExist:
         logger.error(f"User {user_id} not found")
@@ -26,7 +31,9 @@ def send_verification_email_task(self, user_id):
         
     except Exception as exc:
         logger.error(f"Failed to send verification email: {str(exc)}")
-        raise self.retry(exc=exc)
+        if self.request.retries < self.max_retries:
+            raise self.retry(exc=exc)
+        raise
 
 
 @shared_task(bind=True, max_retries=3)
