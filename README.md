@@ -14,9 +14,15 @@ JWT: For secure user authentication.<br>
 Swagger/OpenAPI: To document and test APIs.
 
 ## API Documentation
-**Live Documentation:**
+**Live API:**
+- API Base: https://modestwear.onrender.com
 - Swagger UI: https://modestwear.onrender.com/docs/
 - ReDoc: https://modestwear.onrender.com/redoc/
+
+**Comprehensive Documentation:**
+- Full Documentation: [Build locally](docs/README.md) or deploy to Read the Docs
+- 30+ endpoints with examples, business logic, and architecture details
+- See [docs/](docs/) folder for complete Sphinx documentation
 
 
 
