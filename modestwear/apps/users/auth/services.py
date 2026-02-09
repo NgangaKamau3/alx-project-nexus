@@ -22,14 +22,14 @@ class AuthenticationService:
             email(str): user email
             password(str): User password
             phone_number(str, optional): User's phone number 
-            full_name(str, optional): User's full name
+            full_name(str): User's full name (REQUIRED)
             request_meta(dict, optional): Request metadata for security logging
         Returns:
             tuple: (success, response_dict, status_code)
             """
         from apps.users.verification.services import EmailVerificationService
-        if not email or not password:
-            return False, {"Success": False, "error": "Email and passwword are requires"}, 400
+        if not email or not password or not full_name:
+            return False, {"success": False, "error": "Email, password, and full name are required"}, 400
         
         if request_meta:
             logger.info(f"Registration attempt from IP: {request_meta.get('REMOTE_ADDR')}")

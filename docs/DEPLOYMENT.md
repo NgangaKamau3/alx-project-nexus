@@ -194,7 +194,7 @@ python -m http.server 8000 --directory build/html
 | Swagger UI | https://modestwear.onrender.com/docs/ | Interactive API testing |
 | ReDoc | https://modestwear.onrender.com/redoc/ | API reference |
 | Frontend | https://modestwear-app.vercel.app | Web application |
-| Documentation | https://modestwear-api.readthedocs.io | Full documentation |
+| Documentation | https://alx-project-nexus.readthedocs.io/ | Full documentation |
 
 ## Next Steps
 

@@ -20,9 +20,9 @@ Swagger/OpenAPI: To document and test APIs.
 - ReDoc: https://modestwear.onrender.com/redoc/
 
 **Comprehensive Documentation:**
-- Full Documentation: [Build locally](docs/README.md) or deploy to Read the Docs
+- Full Documentation: https://alx-project-nexus.readthedocs.io/
 - 30+ endpoints with examples, business logic, and architecture details
-- See [docs/](docs/) folder for complete Sphinx documentation
+- See [docs/](docs/) folder for source files
 
 
 

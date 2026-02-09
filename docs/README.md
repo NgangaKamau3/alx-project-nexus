@@ -251,6 +251,7 @@ python -m http.server 8000
 
 ## 🔗 Live Documentation
 
+- **Full Documentation**: https://alx-project-nexus.readthedocs.io/
 - **Swagger UI**: https://modestwear.onrender.com/docs/
 - **ReDoc**: https://modestwear.onrender.com/redoc/
 - **API Base**: https://modestwear.onrender.com

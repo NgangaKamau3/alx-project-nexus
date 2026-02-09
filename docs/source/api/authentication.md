@@ -41,7 +41,7 @@ Create a new user account with email and password.
 |-------|------|----------|-------------|
 | email | string | Yes | Valid email address (unique) |
 | password | string | Yes | Min 8 chars, not too common |
-| full_name | string | No | Auto-split into first/last name |
+| full_name | string | Yes | Auto-split into first/last name |
 | phone_number | string | No | Contact number |
 
 **Password Requirements:**
@@ -122,7 +122,7 @@ curl -X POST https://modestwear.onrender.com/api/users/register/ \
 ```json
 {
   "success": false,
-  "error": "Email and password are required"
+  "error": "Email, password, and full name are required"
 }
 ```
 

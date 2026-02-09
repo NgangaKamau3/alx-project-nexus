@@ -262,7 +262,8 @@ This documentation provides:
 
 ## 🔗 Quick Links
 
-- **Build Docs:** `cd docs && sphinx-build -b html source build/html`
+- **Full Documentation:** https://alx-project-nexus.readthedocs.io/
+- **Build Docs Locally:** `cd docs && sphinx-build -b html source build/html`
 - **Live API:** https://modestwear.onrender.com
 - **Swagger:** https://modestwear.onrender.com/docs/
 - **Frontend:** https://modestwear-app.vercel.app
